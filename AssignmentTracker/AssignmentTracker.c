@@ -1,8 +1,10 @@
 #include <gtk/gtk.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include<string.h>
 #include "files/combolist.c"
 
+int autoSubmitCheck =0;
 GtkWidget *window;
 GtkWidget *box, *container, *comboSubject, *comboSemester, *entry, *frame, *label, *calendar, *button,*vbox,*checkButton;
 
@@ -226,79 +228,25 @@ static void func_call(GtkWidget *label , gpointer user_data){
     int num = atoi(text); //converts str into int
     deleteInfo(num); //main function for deleting the specific line
     // displayAssignment()
-    Page_2();
+    homePage();
 }
 
-static void submitAssignment(int id){
-    char sem[50],subject[50],work[50],status[50],year[50];
-    FILE *originalFile = fopen("files/storeAssignment.txt", "r");
-
-    if (originalFile == NULL) {
-        printf("Unable to open the file.\n");
-        return 1;
-    }
-
-    FILE *newFile = fopen("files/tempfile.txt", "w");
-    if (newFile == NULL) {
-        printf("Unable to create the temporary file.\n");
-        fclose(originalFile);
-        return 1;
-    }
-
-    char buffer[1000];
-    char combined[100];
-    int fileId;
-    // Read lines from the original file and write to the new file, skipping the specified line
-    while (fgets(buffer, sizeof(buffer), originalFile) != NULL) {
-        sscanf(buffer,"%d,%[^,],%[^,],%[^,],%[^,],%s",&fileId,sem,subject,work,year,status);
-        if(fileId ==id){
-            sprintf(combined, "%d,%s,%s,%s,%s,Done\n",fileId,sem,subject,work,year,status);
-            fputs(combined,newFile);
-        }
-        else{
-            fputs(buffer, newFile);
-        }
-        
-    }
-
-    fclose(originalFile);
-    fclose(newFile);
-
-    // Remove the original file
-    if (remove("files/storeAssignment.txt") == 0) {
-        // Rename the new file to the original filename
-        if (rename("files/tempfile.txt", "files/storeAssignment.txt") != 0) {
-            printf("Unable to rename the temporary file.\n");
-            return 1;
-        }
-        printf("Id %d successfully.\n", fileId);
-        destroyWindow(window);
-        Page_2();
-    } 
-    else {
-        printf("Unable to delete the original file.\n");
-        return 1;
-    }
-}
-
-static void unsubmitAssignment(int id){
+void unsubmitAssignment(int id){
 
     char sem[50],subject[50],work[50],status[50],year[50];
      FILE *originalFile = fopen("files/storeAssignment.txt", "r");
     if (originalFile == NULL) {
         printf("Unable to open the file.\n");
-        return 1;
     }
 
     FILE *newFile = fopen("files/tempfile.txt", "w");
     if (newFile == NULL) {
         printf("Unable to create the temporary file.\n");
         fclose(originalFile);
-        return 1;
     }
 
     char buffer[1000];
-    char combined[100];
+    char combined[1000];
     int fileId;
     // Read lines from the original file and write to the new file, skipping the specified line
     while (fgets(buffer, sizeof(buffer), originalFile) != NULL) {
@@ -321,30 +269,85 @@ static void unsubmitAssignment(int id){
         // Rename the new file to the original filename
         if (rename("files/tempfile.txt", "files/storeAssignment.txt") != 0) {
             printf("Unable to rename the temporary file.\n");
-            return 1;
         }
         printf("Id %d successfully.\n", fileId);
         destroyWindow(window);
-        Page_2();
+        homePage();
     } else {
         printf("Unable to delete the original file.\n");
+    }
+}
+
+void submitAssignment(int id){
+    char sem[50],subject[50],work[50],status[50],year[50];
+    FILE *originalFile = fopen("files/storeAssignment.txt", "r");
+
+    if (originalFile == NULL) {
+        printf("Unable to open the file.\n");
         return 1;
+    }
+
+    FILE *newFile = fopen("files/tempfile.txt", "w");
+    if (newFile == NULL) {
+        printf("Unable to create the temporary file.\n");
+        fclose(originalFile);
+        return 1;
+    }
+
+    char buffer[1000];
+    char combined[1000];
+    int fileId;
+    // Read lines from the original file and write to the new file, skipping the specified line
+    while (fgets(buffer, sizeof(buffer), originalFile) != NULL) {
+        sscanf(buffer,"%d,%[^,],%[^,],%[^,],%[^,],%s",&fileId,sem,subject,work,year,status);
+        if(fileId ==id){
+            sprintf(combined, "%d,%s,%s,%s,%s,Done\n",fileId,sem,subject,work,year,status);
+            fputs(combined,newFile);
+        }
+        else{
+            fputs(buffer, newFile);
+        }
+        
+    }
+
+    fclose(originalFile);
+    fclose(newFile);
+
+    // Remove the original file
+
+    if (remove("files/storeAssignment.txt") == 0) {
+        // Rename the new file to the original filename
+        if (rename("files/tempfile.txt", "files/storeAssignment.txt") != 0) {
+            printf("Unable to rename the temporary file.\n");
+        }
+        printf("Id %d successfully.\n", fileId);
+        destroyWindow(window);
+        homePage();
+    } 
+    else {
+        printf("Unable to delete the original file.\n");
     }
 }
 
 void checkTask(GtkToggleButton *checkButton, gpointer data){
 
     gboolean status = gtk_check_button_get_active(checkButton);
+    printf("Status = %d\n",status);
     gchar *text = gtk_label_get_text(data);
     int numId = atoi(text);
     printf("Id: %d\n",numId);
-    if (status){
+    if (status==1 && autoSubmitCheck!=0){
+    // if(status){
+        // printf("Btn clicked");
         submitAssignment(numId);
-
+        autoSubmitCheck ++;//when we first run the program, if the submit is in done. Then button automatically toggles and checks the toggle. This will prevent the program to call submitAssignment.
     }
-    else{
+    else if(autoSubmitCheck!=0){
+    // else {
         unsubmitAssignment(numId);
+        autoSubmitCheck++;
     }
+    autoSubmitCheck = 1;
 }
 
 static void addWork(){
@@ -391,56 +394,13 @@ static void addWork(){
     
 }
 
-void displayIfNotEmpty(GtkWidget *parentContainer){
-    FILE *fp = fopen("files/storeAssignment.txt","r");
-    struct Assignment assignment[100];
-    int record = 0,sno;
-    char snoStr[100],id[100];
-    while(!feof(fp)){
-        fscanf(fp,"%d, %50[^,],%50[^,],%50[^,],%50[^,],%50[^\n]\n",&assignment[record].id,assignment[record].semester,assignment[record].subject, assignment[record].work, assignment[record].date,assignment[record].status);
-        sno = record + 1;
-        sprintf(snoStr,"%d. ",sno);
-        sprintf(id,"%d",assignment[record].id);
-
-        GtkWidget *box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL,3);
-        gtk_box_append(GTK_BOX(parentContainer), box);
-
-        GtkWidget *elementId = gtk_label_new(id);
-
-        GtkWidget *recordLabel = gtk_label_new(snoStr);
-        gtk_box_append(GTK_BOX(box), recordLabel);
-
-        if(strcmp(assignment[record].status,"Done")==0){
-            createLabel(box,assignment[record].semester,"label-submit",0);
-            createLabel(box,assignment[record].subject,"label-submit",0);
-            createLabel(box,assignment[record].work,"label-submit",0);
-            createLabel(box,assignment[record].date,"label-submit",0);
-            createCheckBox(box,G_CALLBACK(checkTask),elementId,1);
-        }
-        else{
-            createLabel(box,assignment[record].semester,"null",0);
-            createLabel(box,assignment[record].subject,"null",0);
-            createLabel(box,assignment[record].work,"null",0);
-            createLabel(box,assignment[record].date,"null",0);
-            createCheckBox(box,G_CALLBACK(checkTask),elementId,0);
-        }
-        
-        createButton(box,"Delete","delete-btn",G_CALLBACK(func_call),elementId); //button that deletes the specific id from file.
-        
-        printf("%d. Subject = %s \t Work = %s \t Date = %s\n", record + 1, assignment[record].subject,assignment[record].work,assignment[record].date );
-        record = record + 1;
-    }
-}
-
 static void displayAssignment(GtkWidget *parentContainer){
     FILE *fp = fopen("files/storeAssignment.txt","r");
-    struct Assignment assignment[100];
     int record = 0,sno;
     char snoStr[100],id[100];
     // Check if the file exists
     if (fp == NULL) {
         printf("File does not exist.\n");
-        return 1;
     }
 
     // Move the file position indicator to the end of the file
@@ -448,8 +408,8 @@ static void displayAssignment(GtkWidget *parentContainer){
 
     // Get the current position of the file position indicator
     long fileSize = ftell(fp);
-    fclose(fp);
     // Check if the file size is 0
+    fclose(fp);
     if (fileSize == 0) {
         GtkWidget *box = gtk_box_new(GTK_ORIENTATION_VERTICAL,5);
         gtk_box_append(GTK_BOX(parentContainer), box);
@@ -460,26 +420,69 @@ static void displayAssignment(GtkWidget *parentContainer){
     } 
 
     else {
-        displayIfNotEmpty(parentContainer);
+        FILE *fp = fopen("files/storeAssignment.txt","r");
+        struct Assignment assignment[100];
+        int record = 0,sno;
+        char snoStr[100],id[100];
+        while(!feof(fp)){
+            fscanf(fp,"%d, %50[^,],%50[^,],%50[^,],%50[^,],%50[^\n]\n",&assignment[record].id,assignment[record].semester,assignment[record].subject, assignment[record].work, assignment[record].date,assignment[record].status);
+            sno = record + 1;
+            sprintf(snoStr,"%d. ",sno);
+            sprintf(id,"%d",assignment[record].id);
+
+            GtkWidget *box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL,3);
+            gtk_box_append(GTK_BOX(parentContainer), box);
+
+            GtkWidget *elementId = gtk_label_new(id);
+
+            GtkWidget *recordLabel = gtk_label_new(snoStr);
+            gtk_box_append(GTK_BOX(box), recordLabel);
+
+            if(strcmp(assignment[record].status,"Done")==0){
+                createLabel(box,assignment[record].semester,"label-submit",0);
+                createLabel(box,assignment[record].subject,"label-submit",0);
+                createLabel(box,assignment[record].work,"label-submit",0);
+                createLabel(box,assignment[record].date,"label-submit",0);
+                createCheckBox(box,G_CALLBACK(checkTask),elementId,1);
+            }
+            else{
+                createLabel(box,assignment[record].semester,"null",0);
+                createLabel(box,assignment[record].subject,"null",0);
+                createLabel(box,assignment[record].work,"null",0);
+                createLabel(box,assignment[record].date,"null",0);
+                createCheckBox(box,G_CALLBACK(checkTask),elementId,0);
+            }
+            
+            createButton(box,"Delete","delete-btn",G_CALLBACK(func_call),elementId); //button that deletes the specific id from file.
+            
+            printf("%d. Subject = %s \t Work = %s \t Date = %s\n", record + 1, assignment[record].subject,assignment[record].work,assignment[record].date );
+            record = record + 1;
+        }
+
+        fclose(fp);
     }
-    fclose(fp);
 }
 
-static void go_back1(){
-        destroyWindow(window);
-        homePage();
-}
-
-void Page_2(){
+void go_back_pg_2(){
     destroyWindow(window);
+    Page_2();
+}
 
+void go_to_homepage(){
+    destroyWindow(window);
+    homePage();
+}
+
+
+
+void homePage(){
     //-----------------------------CONTAINER------------------------------------------//
     container = gtk_box_new(GTK_ORIENTATION_VERTICAL,0);
     gtk_widget_set_name(container, "container");
 
     gtk_window_set_child(GTK_WINDOW(window), container);
     
-    createButton(container,"BACK","btn",G_CALLBACK(go_back1),NULL);
+    createButton(container,"Add Work","btn",G_CALLBACK(go_back_pg_2),NULL);
 
     //Title
     createLabel(container, "Your Assignments:","title",0);
@@ -501,12 +504,10 @@ void Page_2(){
     displayAssignment(vbox);
     
 
-    gtk_window_present(window);
+    gtk_window_present(GTK_WINDOW(window));
 }
 
-void homePage(){
-    
-    loadCss();// Loads CSS file.
+void Page_2(){
     //-----------------------------CONTAINER------------------------------------------//
     //Main box
     container = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2);
@@ -538,7 +539,7 @@ void homePage(){
     gtk_widget_set_halign(minibox, GTK_ALIGN_END);
     gtk_widget_set_name(minibox, "minibox");
     
-    createButton(minibox,"View Assignment","button2",G_CALLBACK(Page_2), NULL);
+    createButton(minibox,"View Assignment","button2",G_CALLBACK(go_to_homepage), NULL);
     
 
     //-----------------------------CLOSE HEADER---------------------------------------//
@@ -613,6 +614,7 @@ static void createWindow(GtkApplication *app, gpointer user_data){
     gtk_window_set_default_size(GTK_WINDOW(window), 650,700); // sets the default size for the window.
     gtk_window_set_title(GTK_WINDOW(window),"Student's HandBook - Assignment Tracker"); // sets title for the window.
     gtk_widget_set_name(window, "window"); 
+    loadCss();// Loads CSS file.
 
     homePage();
 
