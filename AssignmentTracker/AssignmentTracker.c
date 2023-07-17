@@ -3,12 +3,14 @@
 #include <stdlib.h>
 #include<string.h>
 #include "files/combolist.c"
+#define MAX_LINE_LENGTH 256
 
 int autoSubmitCheck =0;
+int filtersno = 0;
 GtkWidget *window;
-GtkWidget *box, *container, *comboSubject, *comboSemester, *entry, *frame, *label, *calendar, *button,*vbox,*checkButton;
+GtkWidget *box, *container, *comboSubject, *comboSemester, *entry, *frame, *label, *calendar, *button,*vbox,*checkButton,*filterbox,*filter,*filter2;
+char* Subject[100]={"Default"};
 
-#define MAX_LINE_LENGTH 256
 
 struct Assignment
 {
@@ -20,12 +22,78 @@ struct Assignment
     char status[50];
 };
 
+static void filterList(GtkWidget *combo){
+    gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (combo), "All");
+    gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (combo), "Submitted");
+    gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (combo), "UnSubmitted");
+    gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (combo), "Subject");
+}
+
+static void destroyWindow(GtkWidget *window){
+    gtk_window_set_child(GTK_WINDOW(window), NULL);
+}
+
 //To load the css file.
 static void loadCss(){
     GtkCssProvider *css_provider = gtk_css_provider_new();
     gtk_css_provider_load_from_path(css_provider, "files/style.css");
     gtk_style_context_add_provider_for_display(gdk_display_get_default(), GTK_STYLE_PROVIDER(css_provider), GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 
+}
+int isUnique(char *str, int num){
+   for(int i=0;i<num;i++){
+        if(strcmp(Subject[i],str)==0){
+            return 0;// String is not unique
+        }
+    }
+   return 1;//string is unique
+}
+static void filterSubjectSelection(GtkWidget *combo, gpointer user_data){
+    GtkComboBoxText *combo_Filter= GTK_COMBO_BOX_TEXT(filter);
+    gchar *selectedFilter = gtk_combo_box_text_get_active_text(combo_Filter);
+    if(strcmp(selectedFilter,"Subject") == 0 ){
+        int count =0;
+        FILE *fp = fopen("files/storeAssignment.txt","r");
+    struct Assignment assignment[100];
+    int record=0;
+    while(!feof(fp)){
+                fscanf(fp,"%d, %50[^,],%50[^,],%50[^,],%50[^,],%50[^\n]\n",&assignment[record].id,assignment[record].semester,assignment[record].subject, assignment[record].work, assignment[record].date,assignment[record].status);
+                if(isUnique(assignment[record].subject,record)){//This function returns 1 or 0 and below process will only store unique subjects.
+                    Subject[record] = assignment[record].subject; //We are appending the array
+                    record++;
+                }
+    }
+
+    fclose(fp);
+    while (Subject[count] != NULL) {
+        count++;
+    }
+
+    for(int i=0;i<count;i++){
+        printf("%d. %s\n",i+1, Subject[i]);
+    }
+    for(int i=0;i<count;i++){
+        gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (user_data), Subject[i]);
+    }
+        // storedSubject(user_data);
+    }
+    else if(strcmp(selectedFilter,"Submitted") == 0){
+        filtersno = 1;
+        destroyWindow(window);
+        homePage();
+    }
+    else if(strcmp(selectedFilter,"UnSubmitted") == 0){
+        filtersno = 2;
+        destroyWindow(window);
+        homePage();
+    }
+    
+    else if(strcmp(selectedFilter,"All") == 0){
+        filtersno = 0;
+        destroyWindow(window);
+        homePage();
+    }
+    
 }
 
 static void semSelection(GtkWidget *combo, gpointer user_data){
@@ -63,12 +131,9 @@ static void semSelection(GtkWidget *combo, gpointer user_data){
         gtk_combo_box_text_remove_all(user_data);
         SemesterVIII(user_data);
     }
-
 }
 
-static void destroyWindow(GtkWidget *window){
-    gtk_window_set_child(GTK_WINDOW(window), NULL);
-}
+
 
 static void createLabel(GtkWidget *parentContainer, gchar *labelText, gchar *name, int xalign){
     label = gtk_label_new(labelText);
@@ -149,6 +214,7 @@ int getLastId(){
 
         return id;
 }
+
 int lastId(){
     int id;
     FILE *file = fopen("files/storeAssignment.txt", "r");
@@ -177,6 +243,8 @@ int lastId(){
     
     return id;
 }
+
+
 
 static void deleteInfo(int idDel){
     FILE *originalFile = fopen("files/storeAssignment.txt", "r");
@@ -213,13 +281,11 @@ static void deleteInfo(int idDel){
         // Rename the new file to the original filename
         if (rename("files/tempfile.txt", "files/storeAssignment.txt") != 0) {
             printf("Unable to rename the temporary file.\n");
-            return 1;
         }
         printf("Id %d deleted successfully.\n", fileId);
         destroyWindow(window);
     } else {
         printf("Unable to delete the original file.\n");
-        return 1;
     }
 }
 
@@ -307,7 +373,6 @@ void submitAssignment(int id){
         else{
             fputs(buffer, newFile);
         }
-        
     }
 
     fclose(originalFile);
@@ -330,7 +395,6 @@ void submitAssignment(int id){
 }
 
 void checkTask(GtkToggleButton *checkButton, gpointer data){
-
     gboolean status = gtk_check_button_get_active(checkButton);
     printf("Status = %d\n",status);
     gchar *text = gtk_label_get_text(data);
@@ -391,7 +455,6 @@ static void addWork(){
     // gtk_combo_box_set_active(GTK_COMBO_BOX(comboSemester), -1);
     gtk_combo_box_set_active(GTK_COMBO_BOX(comboSubject), -1);
     fclose(fp);
-    
 }
 
 static void displayAssignment(GtkWidget *parentContainer){
@@ -413,12 +476,8 @@ static void displayAssignment(GtkWidget *parentContainer){
     if (fileSize == 0) {
         GtkWidget *box = gtk_box_new(GTK_ORIENTATION_VERTICAL,5);
         gtk_box_append(GTK_BOX(parentContainer), box);
-        
         createLabel(box,"Nothing to Show!!!","nothing-box",0);
-        
-        
-    } 
-
+    }
     else {
         FILE *fp = fopen("files/storeAssignment.txt","r");
         struct Assignment assignment[100];
@@ -427,7 +486,7 @@ static void displayAssignment(GtkWidget *parentContainer){
         while(!feof(fp)){
             fscanf(fp,"%d, %50[^,],%50[^,],%50[^,],%50[^,],%50[^\n]\n",&assignment[record].id,assignment[record].semester,assignment[record].subject, assignment[record].work, assignment[record].date,assignment[record].status);
             sno = record + 1;
-            sprintf(snoStr,"%d. ",sno);
+            sprintf(snoStr,"%d. ",sno);//converting integer to string
             sprintf(id,"%d",assignment[record].id);
 
             GtkWidget *box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL,3);
@@ -435,30 +494,62 @@ static void displayAssignment(GtkWidget *parentContainer){
 
             GtkWidget *elementId = gtk_label_new(id);
 
-            GtkWidget *recordLabel = gtk_label_new(snoStr);
-            gtk_box_append(GTK_BOX(box), recordLabel);
-
-            if(strcmp(assignment[record].status,"Done")==0){
-                createLabel(box,assignment[record].semester,"label-submit",0);
-                createLabel(box,assignment[record].subject,"label-submit",0);
-                createLabel(box,assignment[record].work,"label-submit",0);
-                createLabel(box,assignment[record].date,"label-submit",0);
-                createCheckBox(box,G_CALLBACK(checkTask),elementId,1);
-            }
-            else{
-                createLabel(box,assignment[record].semester,"null",0);
-                createLabel(box,assignment[record].subject,"null",0);
-                createLabel(box,assignment[record].work,"null",0);
-                createLabel(box,assignment[record].date,"null",0);
-                createCheckBox(box,G_CALLBACK(checkTask),elementId,0);
+            
+            if(filtersno ==0){
+                GtkWidget *recordLabel = gtk_label_new(snoStr);
+                gtk_box_append(GTK_BOX(box), recordLabel);
+                if(strcmp(assignment[record].status,"Done")==0){
+                    createLabel(box,assignment[record].semester,"label-submit",0);
+                    createLabel(box,assignment[record].subject,"label-submit",0);
+                    createLabel(box,assignment[record].work,"label-submit",0);
+                    createLabel(box,assignment[record].date,"label-submit",0);
+                    createCheckBox(box,G_CALLBACK(checkTask),elementId,1);
+                    }
+                else{
+                    createLabel(box,assignment[record].semester,"null",0);
+                    createLabel(box,assignment[record].subject,"null",0);
+                    createLabel(box,assignment[record].work,"null",0);
+                    createLabel(box,assignment[record].date,"null",0);
+                    createCheckBox(box,G_CALLBACK(checkTask),elementId,0);
+                }
+                createButton(box,"Delete","delete-btn",G_CALLBACK(func_call),elementId); //button that deletes the specific id from file.
+                
+                printf("%d. Subject = %s \t Work = %s \t Date = %s\n", record + 1, assignment[record].subject,assignment[record].work,assignment[record].date );
+                record = record + 1;
             }
             
-            createButton(box,"Delete","delete-btn",G_CALLBACK(func_call),elementId); //button that deletes the specific id from file.
-            
-            printf("%d. Subject = %s \t Work = %s \t Date = %s\n", record + 1, assignment[record].subject,assignment[record].work,assignment[record].date );
-            record = record + 1;
+            else if(filtersno==1){
+                
+                if(strcmp(assignment[record].status,"Done")==0){
+                    GtkWidget *recordLabel = gtk_label_new(snoStr);
+                    gtk_box_append(GTK_BOX(box), recordLabel);
+                    createLabel(box,assignment[record].semester,"label-submit",0);
+                    createLabel(box,assignment[record].subject,"label-submit",0);
+                    createLabel(box,assignment[record].work,"label-submit",0);
+                    createLabel(box,assignment[record].date,"label-submit",0);
+                    createCheckBox(box,G_CALLBACK(checkTask),elementId,1);
+                    createButton(box,"Delete","delete-btn",G_CALLBACK(func_call),elementId); //button that deletes the specific id from file.
+                
+                printf("%d. Subject = %s \t Work = %s \t Date = %s\n", record + 1, assignment[record].subject,assignment[record].work,assignment[record].date );
+                record = record + 1;
+                }
+            }
+            else if(filtersno==2){
+                if(strcmp(assignment[record].status,"Pending")==0){
+                    GtkWidget *recordLabel = gtk_label_new(snoStr);
+                    gtk_box_append(GTK_BOX(box), recordLabel);
+                    createLabel(box,assignment[record].semester,"null",0);
+                    createLabel(box,assignment[record].subject,"null",0);
+                    createLabel(box,assignment[record].work,"null",0);
+                    createLabel(box,assignment[record].date,"null",0);
+                    createCheckBox(box,G_CALLBACK(checkTask),elementId,0);
+                createButton(box,"Delete","delete-btn",G_CALLBACK(func_call),elementId); //button that deletes the specific id from file.
+                
+                printf("%d. Subject = %s \t Work = %s \t Date = %s\n", record + 1, assignment[record].subject,assignment[record].work,assignment[record].date );
+                record = record + 1;
+                }
+            }
         }
-
         fclose(fp);
     }
 }
@@ -472,8 +563,6 @@ void go_to_homepage(){
     destroyWindow(window);
     homePage();
 }
-
-
 
 void homePage(){
     //-----------------------------CONTAINER------------------------------------------//
@@ -491,6 +580,32 @@ void homePage(){
     vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL,0);
     gtk_box_append(GTK_BOX(container),vbox);
 
+    createLabel(vbox, "FILTER:","", 1);//layout funct(BoxToAppend, Title, NameForCss,boolean value for x-align(T))
+    filterbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL,0);
+    gtk_box_append(GTK_BOX(vbox),filterbox);
+
+    //Label for DropDown/Combobox
+    
+    //To create a DropDown.
+    filter = gtk_combo_box_text_new();
+    filterList(filter);// This fucntion provides option for DropDown.
+    gtk_box_append (GTK_BOX(filterbox), filter);
+    if(filtersno ==0){
+        gtk_combo_box_set_active(GTK_COMBO_BOX(filter), 0);
+    }
+    else if(filtersno == 1){
+        gtk_combo_box_set_active(GTK_COMBO_BOX(filter), 1);
+    }
+    else if(filtersno == 2){
+        gtk_combo_box_set_active(GTK_COMBO_BOX(filter), 2);
+    }
+
+    
+
+    filter2 = gtk_combo_box_text_new();
+    gtk_box_append (GTK_BOX(filterbox), filter2);
+    g_signal_connect(filter, "changed", G_CALLBACK(filterSubjectSelection),filter2);
+
     //title-box(table)
     // box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL,5);
     // gtk_box_append(GTK_BOX(vbox), box);
@@ -500,10 +615,10 @@ void homePage(){
     // createLabel(box,"Subject","table-title",0);
     // createLabel(box,"Assignment","table-title",0);
     // createLabel(box,"Due Date","table-title",0);
-    
+
     displayAssignment(vbox);
     
-
+    printf("%d", filtersno);
     gtk_window_present(GTK_WINDOW(window));
 }
 
@@ -619,7 +734,6 @@ static void createWindow(GtkApplication *app, gpointer user_data){
     homePage();
 
 }
-
 int main(int argc, char **argv){
     GtkApplication *app;
     int status;
