@@ -5,7 +5,7 @@
 #include "files/combolist.c"
 #define MAX_LINE_LENGTH 256
 
-int autoSubmitCheck =0;
+int autoSubmitCheck =0,total=0,pending=0,completed=0;
 int filtersno = 0;
 GtkWidget *window;
 GtkWidget *box, *container, *comboSubject, *comboSemester, *entry, *frame, *label, *calendar, *button,*vbox,*checkButton,*filterbox,*filter,*filter2;
@@ -94,7 +94,24 @@ static void filterSubjectSelection(GtkWidget *combo, gpointer user_data){
     }
     
 }
-
+static void checkInfo(){
+    FILE *fp = fopen("files/storeAssignment.txt","r");
+        int record = 0;
+        struct Assignment assignment[100];
+        while(!feof(fp)){
+            fscanf(fp,"%d, %50[^,],%50[^,],%50[^,],%50[^,],%50[^\n]\n",&assignment[record].id,assignment[record].semester,assignment[record].subject, assignment[record].work, assignment[record].date,assignment[record].status);
+            total++;
+            if(strcmp(assignment[record].status,"Done")==0){
+                completed++; 
+                record++;
+            }
+            else{
+                pending++;
+                record++;
+            }
+        }
+        fclose(fp);
+}
 static void semSelection(GtkWidget *combo, gpointer user_data){
     GtkComboBoxText *combo_semSelction = GTK_COMBO_BOX_TEXT(comboSemester);
     gchar *selectedSemester = gtk_combo_box_text_get_active_text(combo_semSelction);
@@ -149,7 +166,12 @@ static void createButton(GtkWidget *parentContainer, gchar *labelText, gchar *na
     gtk_box_append(GTK_BOX(parentContainer),button);
     g_signal_connect(button, "clicked", callback, data);
 }
-
+static void buttonInGrid(GtkWidget *mainGrid, gchar *labelText, gchar *name, int col, int row, GCallback callback, gpointer data){
+    button = gtk_button_new_with_label(labelText);
+    gtk_widget_set_name(button,name);
+    g_signal_connect(button, "clicked", callback, data);
+    gtk_grid_attach(GTK_GRID(mainGrid),button,col,row,1,1);
+}
 static void labelInGrid(GtkWidget *mainGrid, gchar *labelText, gchar *name, int col, int row){
     label = gtk_label_new(labelText);
     gtk_grid_attach(GTK_GRID(mainGrid),label,col,row,1,1);
@@ -510,35 +532,37 @@ static void displayAssignment(GtkWidget *parentContainer){
                 if(strcmp(assignment[record].status,"Done")==0){
                     labelInGrid(parentContainer,snoStr,"label-submit",col,row);
                     col++;
-                    labelInGrid(parentContainer,assignment[record].semester,"label-submit",col,row);
-                    col++;
+                    // labelInGrid(parentContainer,assignment[record].semester,"label-submit",col,row);
+                    // col++;
                     labelInGrid(parentContainer,assignment[record].subject,"label-submit",col,row);
                     col++;
                     labelInGrid(parentContainer,assignment[record].work,"label-submit",col,row);
                     col++;
                     labelInGrid(parentContainer,assignment[record].date,"label-submit",col,row);
                     col++;
+                    GtkWidget *checkAndDel = gtk_box_new(GTK_ORIENTATION_HORIZONTAL,5);
+                    gtk_grid_attach(GTK_GRID(parentContainer),checkAndDel,col,row,1,1);
 
-                    // createLabel(box,assignment[record].semester,"label-submit",0);
-                    // createLabel(box,assignment[record].subject,"label-submit",0);
-                    // createLabel(box,assignment[record].work,"label-submit",0);
-                    // createLabel(box,assignment[record].date,"label-submit",0);
-                    // createCheckBox(box,G_CALLBACK(checkTask),elementId,1);
+                    createCheckBox(checkAndDel,G_CALLBACK(checkTask),elementId,1);
+                    createButton(checkAndDel,"X","delete-btn",G_CALLBACK(func_call),elementId);
                     }
                 else{
                     labelInGrid(parentContainer,snoStr,"blaa",col,row);
                     col++;
-                    labelInGrid(parentContainer,assignment[record].semester,"blaa",col,row);
-                    col++;
+                    // labelInGrid(parentContainer,assignment[record].semester,"blaa",col,row);
+                    // col++;
                     labelInGrid(parentContainer,assignment[record].subject,"blaa",col,row);
                     col++;
                     labelInGrid(parentContainer,assignment[record].work,"blaa",col,row);
                     col++;
                     labelInGrid(parentContainer,assignment[record].date,"blaa",col,row);
                     col++;
-                    // createCheckBox(box,G_CALLBACK(checkTask),elementId,1)
+                    GtkWidget *checkAndDel = gtk_box_new(GTK_ORIENTATION_HORIZONTAL,5);
+                    gtk_grid_attach(GTK_GRID(parentContainer),checkAndDel,col,row,1,1);
+
+                    createCheckBox(checkAndDel,G_CALLBACK(checkTask),elementId,0);
+                    createButton(checkAndDel,"X","delete-btn",G_CALLBACK(func_call),elementId); //button that deletes the specific id from file.
                 }
-                // createButton(box,"X","delete-btn",G_CALLBACK(func_call),elementId); //button that deletes the specific id from file.
                 
                 printf("%d. Subject = %s \t Work = %s \t Date = %s\n", record + 1, assignment[record].subject,assignment[record].work,assignment[record].date );
                 record = record + 1;
@@ -547,19 +571,22 @@ static void displayAssignment(GtkWidget *parentContainer){
             else if(filtersno==1){
                 if(strcmp(assignment[record].status,"Done")==0){
                     printf("col:%d,Row:%d\n", col, row);
-                    labelInGrid(parentContainer,snoStr,"blaa",col,row);
+                    labelInGrid(parentContainer,snoStr,"label-submit",col,row);
                     col++;
-                    labelInGrid(parentContainer,assignment[record].semester,"blaa",col,row);
+                    // labelInGrid(parentContainer,assignment[record].semester,"blaa",col,row);
+                    // col++;
+                    labelInGrid(parentContainer,assignment[record].subject,"label-submit",col,row);
                     col++;
-                    labelInGrid(parentContainer,assignment[record].subject,"blaa",col,row);
+                    labelInGrid(parentContainer,assignment[record].work,"label-submit",col,row);
                     col++;
-                    labelInGrid(parentContainer,assignment[record].work,"blaa",col,row);
+                    labelInGrid(parentContainer,assignment[record].date,"label-submit",col,row);
                     col++;
-                    labelInGrid(parentContainer,assignment[record].date,"blaa",col,row);
-                    col++;
-                    // createCheckBox(box,G_CALLBACK(checkTask),elementId,1)
-                    // createButton(box,"X","delete-btn",G_CALLBACK(func_call),elementId); //button that deletes the specific id from file.
-                
+                    GtkWidget *checkAndDel = gtk_box_new(GTK_ORIENTATION_HORIZONTAL,5);
+                    gtk_grid_attach(GTK_GRID(parentContainer),checkAndDel,col,row,1,1);
+
+                    createCheckBox(checkAndDel,G_CALLBACK(checkTask),elementId,0);
+                    createButton(checkAndDel,"X","delete-btn",G_CALLBACK(func_call),elementId);//button that deletes the specific id from file.
+                    
                 printf("%d. Subject = %s \t Work = %s \t Date = %s\n", record + 1, assignment[record].subject,assignment[record].work,assignment[record].date );
                 record = record + 1;
                 row++;
@@ -569,16 +596,19 @@ static void displayAssignment(GtkWidget *parentContainer){
                 if(strcmp(assignment[record].status,"Pending")==0){
                     labelInGrid(parentContainer,snoStr,"blaa",col,row);
                     col++;
-                    labelInGrid(parentContainer,assignment[record].semester,"blaa",col,row);
-                    col++;
+                    // labelInGrid(parentContainer,assignment[record].semester,"blaa",col,row);
+                    // col++;
                     labelInGrid(parentContainer,assignment[record].subject,"blaa",col,row);
                     col++;
                     labelInGrid(parentContainer,assignment[record].work,"blaa",col,row);
                     col++;
                     labelInGrid(parentContainer,assignment[record].date,"blaa",col,row);
                     col++;
-                    // createCheckBox(box,G_CALLBACK(checkTask),elementId,1)
-                // createButton(box,"Delete","delete-btn",G_CALLBACK(func_call),elementId); //button that deletes the specific id from file.
+                    GtkWidget *checkAndDel = gtk_box_new(GTK_ORIENTATION_HORIZONTAL,5);
+                    gtk_grid_attach(GTK_GRID(parentContainer),checkAndDel,col,row,1,1);
+
+                    createCheckBox(checkAndDel,G_CALLBACK(checkTask),elementId,0);
+                    createButton(checkAndDel,"X","delete-btn",G_CALLBACK(func_call),elementId);//button that deletes the specific id from file.
                 
                 printf("%d. Subject = %s \t Work = %s \t Date = %s\n", record + 1, assignment[record].subject,assignment[record].work,assignment[record].date );
                 record = record + 1;
@@ -602,6 +632,13 @@ void go_to_homepage(){
 
 void homePage(){
     //-----------------------------CONTAINER------------------------------------------//
+    checkInfo();
+    char strTotal[5],strCompleted[5],strPending[5];
+    //converting the total, pending and completed works into string to display in label.
+    sprintf(strTotal, "%d", total);
+    sprintf(strCompleted, "%d", completed);
+    sprintf(strPending, "%d", pending);
+    printf("Completed:%d\tPending:%d", completed,pending);
     container = gtk_box_new(GTK_ORIENTATION_VERTICAL,3);
     gtk_widget_set_name(container, "container");
 
@@ -632,6 +669,17 @@ void homePage(){
     GtkWidget *infoBar =gtk_box_new(GTK_ORIENTATION_VERTICAL,3);
     gtk_box_append(GTK_BOX(halign),infoBar);
     gtk_widget_set_name(infoBar,"box1");
+
+    GtkWidget *subInfoBar = gtk_box_new(GTK_ORIENTATION_VERTICAL,3);
+    gtk_widget_set_name(subInfoBar,"box1_2");
+    gtk_box_append(GTK_BOX(infoBar), subInfoBar);
+
+    createLabel(subInfoBar,"Total Work", "InfoHead", 0);
+    createLabel(subInfoBar,strTotal, "subInfo", 0);
+    createLabel(subInfoBar,"Due", "InfoHead", 0);
+    createLabel(subInfoBar,strPending, "InfoHead", 0);
+    createLabel(subInfoBar,"Completed", "InfoHead", 0);
+    createLabel(subInfoBar,strCompleted, "InfoHead", 0);
     
     GtkWidget *subcontainer = gtk_box_new(GTK_ORIENTATION_VERTICAL, 3);
     gtk_box_append(GTK_BOX(halign), subcontainer);
@@ -660,9 +708,7 @@ void homePage(){
     else if(filtersno == 2){
         gtk_combo_box_set_active(GTK_COMBO_BOX(filter), 2);
     }
-
     
-
     filter2 = gtk_combo_box_text_new();
     gtk_box_append (GTK_BOX(filterbox), filter2);
     g_signal_connect(filter, "changed", G_CALLBACK(filterSubjectSelection),filter2);
