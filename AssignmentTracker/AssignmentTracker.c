@@ -47,6 +47,7 @@ int isUnique(char *str, int num){
     }
    return 1;//string is unique
 }
+
 static void filterSubjectSelection(GtkWidget *combo, gpointer user_data){
     GtkComboBoxText *combo_Filter= GTK_COMBO_BOX_TEXT(filter);
     gchar *selectedFilter = gtk_combo_box_text_get_active_text(combo_Filter);
@@ -147,6 +148,12 @@ static void createButton(GtkWidget *parentContainer, gchar *labelText, gchar *na
     gtk_widget_set_name(button,name);
     gtk_box_append(GTK_BOX(parentContainer),button);
     g_signal_connect(button, "clicked", callback, data);
+}
+
+static void labelInGrid(GtkWidget *mainGrid, gchar *labelText, gchar *name, int col, int row){
+    label = gtk_label_new(labelText);
+    gtk_grid_attach(GTK_GRID(mainGrid),label,col,row,1,1);
+    gtk_widget_set_name(label, name);
 }
 
 static void createCheckBox(GtkWidget *parentContainer,GCallback callback, gpointer data,int active){
@@ -480,69 +487,102 @@ static void displayAssignment(GtkWidget *parentContainer){
         struct Assignment assignment[100];
         int record = 0,sno;
         char snoStr[100],id[100];
+        int row = 1;
         while(!feof(fp)){
+            int col = 0;
             fscanf(fp,"%d, %50[^,],%50[^,],%50[^,],%50[^,],%50[^\n]\n",&assignment[record].id,assignment[record].semester,assignment[record].subject, assignment[record].work, assignment[record].date,assignment[record].status);
             sno = record + 1;
             sprintf(snoStr,"%d. ",sno);//converting integer to string
             sprintf(id,"%d",assignment[record].id);
 
-            GtkWidget *box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL,3);
-            gtk_box_append(GTK_BOX(parentContainer), box);
+            // GtkWidget *box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL,3);
+            // gtk_box_append(GTK_BOX(parentContainer), box);
 
             GtkWidget *elementId = gtk_label_new(id);
+            // GtkWidget *label1 = gtk_label_new("S.No");
+            // gtk_grid_attach(GTK_GRID(grid), label1, 0, 0, 1, 1);
+            // gtk_widget_set_name(label1,"subcontainer-title");
 
             
             if(filtersno ==0){
-                GtkWidget *recordLabel = gtk_label_new(snoStr);
-                gtk_box_append(GTK_BOX(box), recordLabel);
+                // GtkWidget *recordLabel = gtk_label_new(snoStr);
+                // gtk_box_append(GTK_BOX(box), recordLabel);
                 if(strcmp(assignment[record].status,"Done")==0){
-                    createLabel(box,assignment[record].semester,"label-submit",0);
-                    createLabel(box,assignment[record].subject,"label-submit",0);
-                    createLabel(box,assignment[record].work,"label-submit",0);
-                    createLabel(box,assignment[record].date,"label-submit",0);
-                    createCheckBox(box,G_CALLBACK(checkTask),elementId,1);
+                    labelInGrid(parentContainer,snoStr,"label-submit",col,row);
+                    col++;
+                    labelInGrid(parentContainer,assignment[record].semester,"label-submit",col,row);
+                    col++;
+                    labelInGrid(parentContainer,assignment[record].subject,"label-submit",col,row);
+                    col++;
+                    labelInGrid(parentContainer,assignment[record].work,"label-submit",col,row);
+                    col++;
+                    labelInGrid(parentContainer,assignment[record].date,"label-submit",col,row);
+                    col++;
+
+                    // createLabel(box,assignment[record].semester,"label-submit",0);
+                    // createLabel(box,assignment[record].subject,"label-submit",0);
+                    // createLabel(box,assignment[record].work,"label-submit",0);
+                    // createLabel(box,assignment[record].date,"label-submit",0);
+                    // createCheckBox(box,G_CALLBACK(checkTask),elementId,1);
                     }
                 else{
-                    createLabel(box,assignment[record].semester,"null",0);
-                    createLabel(box,assignment[record].subject,"null",0);
-                    createLabel(box,assignment[record].work,"null",0);
-                    createLabel(box,assignment[record].date,"null",0);
-                    createCheckBox(box,G_CALLBACK(checkTask),elementId,0);
+                    labelInGrid(parentContainer,snoStr,"blaa",col,row);
+                    col++;
+                    labelInGrid(parentContainer,assignment[record].semester,"blaa",col,row);
+                    col++;
+                    labelInGrid(parentContainer,assignment[record].subject,"blaa",col,row);
+                    col++;
+                    labelInGrid(parentContainer,assignment[record].work,"blaa",col,row);
+                    col++;
+                    labelInGrid(parentContainer,assignment[record].date,"blaa",col,row);
+                    col++;
+                    // createCheckBox(box,G_CALLBACK(checkTask),elementId,1)
                 }
-                createButton(box,"Delete","delete-btn",G_CALLBACK(func_call),elementId); //button that deletes the specific id from file.
+                // createButton(box,"X","delete-btn",G_CALLBACK(func_call),elementId); //button that deletes the specific id from file.
                 
                 printf("%d. Subject = %s \t Work = %s \t Date = %s\n", record + 1, assignment[record].subject,assignment[record].work,assignment[record].date );
                 record = record + 1;
+                row++;
             }
             else if(filtersno==1){
-                
                 if(strcmp(assignment[record].status,"Done")==0){
-                    GtkWidget *recordLabel = gtk_label_new(snoStr);
-                    gtk_box_append(GTK_BOX(box), recordLabel);
-                    createLabel(box,assignment[record].semester,"label-submit",0);
-                    createLabel(box,assignment[record].subject,"label-submit",0);
-                    createLabel(box,assignment[record].work,"label-submit",0);
-                    createLabel(box,assignment[record].date,"label-submit",0);
-                    createCheckBox(box,G_CALLBACK(checkTask),elementId,1);
-                    createButton(box,"Delete","delete-btn",G_CALLBACK(func_call),elementId); //button that deletes the specific id from file.
+                    printf("col:%d,Row:%d\n", col, row);
+                    labelInGrid(parentContainer,snoStr,"blaa",col,row);
+                    col++;
+                    labelInGrid(parentContainer,assignment[record].semester,"blaa",col,row);
+                    col++;
+                    labelInGrid(parentContainer,assignment[record].subject,"blaa",col,row);
+                    col++;
+                    labelInGrid(parentContainer,assignment[record].work,"blaa",col,row);
+                    col++;
+                    labelInGrid(parentContainer,assignment[record].date,"blaa",col,row);
+                    col++;
+                    // createCheckBox(box,G_CALLBACK(checkTask),elementId,1)
+                    // createButton(box,"X","delete-btn",G_CALLBACK(func_call),elementId); //button that deletes the specific id from file.
                 
                 printf("%d. Subject = %s \t Work = %s \t Date = %s\n", record + 1, assignment[record].subject,assignment[record].work,assignment[record].date );
                 record = record + 1;
+                row++;
                 }
             }
             else if(filtersno==2){
                 if(strcmp(assignment[record].status,"Pending")==0){
-                    GtkWidget *recordLabel = gtk_label_new(snoStr);
-                    gtk_box_append(GTK_BOX(box), recordLabel);
-                    createLabel(box,assignment[record].semester,"null",0);
-                    createLabel(box,assignment[record].subject,"null",0);
-                    createLabel(box,assignment[record].work,"null",0);
-                    createLabel(box,assignment[record].date,"null",0);
-                    createCheckBox(box,G_CALLBACK(checkTask),elementId,0);
-                createButton(box,"Delete","delete-btn",G_CALLBACK(func_call),elementId); //button that deletes the specific id from file.
+                    labelInGrid(parentContainer,snoStr,"blaa",col,row);
+                    col++;
+                    labelInGrid(parentContainer,assignment[record].semester,"blaa",col,row);
+                    col++;
+                    labelInGrid(parentContainer,assignment[record].subject,"blaa",col,row);
+                    col++;
+                    labelInGrid(parentContainer,assignment[record].work,"blaa",col,row);
+                    col++;
+                    labelInGrid(parentContainer,assignment[record].date,"blaa",col,row);
+                    col++;
+                    // createCheckBox(box,G_CALLBACK(checkTask),elementId,1)
+                // createButton(box,"Delete","delete-btn",G_CALLBACK(func_call),elementId); //button that deletes the specific id from file.
                 
                 printf("%d. Subject = %s \t Work = %s \t Date = %s\n", record + 1, assignment[record].subject,assignment[record].work,assignment[record].date );
                 record = record + 1;
+                row++;
                 }
             }
         }
@@ -626,47 +666,36 @@ void homePage(){
     filter2 = gtk_combo_box_text_new();
     gtk_box_append (GTK_BOX(filterbox), filter2);
     g_signal_connect(filter, "changed", G_CALLBACK(filterSubjectSelection),filter2);
-
-
-    //Title
-    // createLabel(container, "Your Assignments:","title",0);
-
-
     
+    GtkWidget *vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL,0);
+    gtk_box_append(GTK_BOX(subcontainer), vbox);
 
-    
+    GtkWidget *grid = gtk_grid_new();
+    gtk_widget_set_name(grid,"table");
+    gtk_box_append(GTK_BOX(vbox), grid);
 
-    //title-box(table)
-    // box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL,5);
-    // gtk_box_append(GTK_BOX(vbox), box);
+    // Add widgets to the table
+    GtkWidget *label1 = gtk_label_new("S.No");
+    gtk_grid_attach(GTK_GRID(grid), label1, 0, 0, 1, 1);
+    gtk_widget_set_name(label1,"subcontainer-title");
 
-    // createLabel(box,"S.No","table-title",0);
-    // createLabel(box,"Semester","table-title",0);
-    // createLabel(box,"Subject","table-title",0);
-    // createLabel(box,"Assignment","table-title",0);
-    // createLabel(box,"Due Date","table-title",0);
-    // GtkWidget *grid = gtk_grid_new();
-    // gtk_widget_set_name(grid,"table");
-    // gtk_box_append(GTK_BOX(vbox), grid);
+    GtkWidget *label2 = gtk_label_new("Subject");
+    gtk_grid_attach(GTK_GRID(grid), label2, 1, 0, 1, 1);
+    gtk_widget_set_name(label2,"subcontainer-title");
 
-    // // Add widgets to the table
-    // GtkWidget *label1 = gtk_label_new("Row 0, Column 0");
-    // gtk_grid_attach(GTK_GRID(grid), label1, 4, 0, 1, 1);
-    // gtk_widget_set_name(label1,"table");
+    GtkWidget *label3 = gtk_label_new("Assignment");
+    gtk_grid_attach(GTK_GRID(grid), label3, 2, 0, 1, 1);
+    gtk_widget_set_name(label3,"subcontainer-title");
 
-    // GtkWidget *label2 = gtk_label_new("Row 0, Column 1");
-    // gtk_grid_attach(GTK_GRID(grid), label2, 1, 0, 1, 1);
-    // gtk_widget_set_name(label2,"table");
+    GtkWidget *label4 = gtk_label_new("Due Date");
+    gtk_grid_attach(GTK_GRID(grid), label4, 3, 0, 1, 1);
+    gtk_widget_set_name(label4,"subcontainer-title");
 
-    // GtkWidget *label3 = gtk_label_new("Row 1, Column 0");
-    // gtk_grid_attach(GTK_GRID(grid), label3, 0, 1, 1, 1);
-    // gtk_widget_set_name(label3,"table");
+    GtkWidget *label5 = gtk_label_new("Action");
+    gtk_grid_attach(GTK_GRID(grid), label5, 4, 0, 1, 1);
+    gtk_widget_set_name(label5,"subcontainer-title");
 
-    // GtkWidget *label4 = gtk_label_new("Row 1, Column 1");
-    // gtk_grid_attach(GTK_GRID(grid), label4, 1, 1, 1, 1);
-    // gtk_widget_set_name(label4,"table");
-
-    // displayAssignment(vbox);
+    displayAssignment(grid);
     
     printf("%d", filtersno);
     gtk_window_present(GTK_WINDOW(window));
