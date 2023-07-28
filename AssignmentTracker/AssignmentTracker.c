@@ -11,7 +11,6 @@ GtkWidget *window;
 GtkWidget *box, *container, *comboSubject, *comboSemester, *entry, *frame, *label, *calendar, *button,*vbox,*checkButton,*filterbox,*filter,*filter2;
 char* Subject[100]={"Default"};
 
-
 struct Assignment
 {
     int id;
@@ -68,7 +67,6 @@ static void filterSubjectSelection(GtkWidget *combo, gpointer user_data){
     while (Subject[count] != NULL) {
         count++;
     }
-
     for(int i=0;i<count;i++){
         printf("%d. %s\n",i+1, Subject[i]);
     }
@@ -293,7 +291,6 @@ static void func_call(GtkWidget *label , gpointer user_data){
     gchar *text = gtk_label_get_text(user_data);// stores the label in text variable i.e id that is to be deleted.
     int num = atoi(text); //converts str into int
     deleteInfo(num); //main function for deleting the specific line
-    // displayAssignment()
     homePage();
 }
 
@@ -517,7 +514,6 @@ static void displayAssignment(GtkWidget *parentContainer){
                 printf("%d. Subject = %s \t Work = %s \t Date = %s\n", record + 1, assignment[record].subject,assignment[record].work,assignment[record].date );
                 record = record + 1;
             }
-            
             else if(filtersno==1){
                 
                 if(strcmp(assignment[record].status,"Done")==0){
@@ -566,23 +562,48 @@ void go_to_homepage(){
 
 void homePage(){
     //-----------------------------CONTAINER------------------------------------------//
-    container = gtk_box_new(GTK_ORIENTATION_VERTICAL,0);
+    container = gtk_box_new(GTK_ORIENTATION_VERTICAL,3);
     gtk_widget_set_name(container, "container");
 
     gtk_window_set_child(GTK_WINDOW(window), container);
     
-    createButton(container,"Add Work","btn",G_CALLBACK(go_back_pg_2),NULL);
+    GtkWidget *box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
+    gtk_box_append(GTK_BOX(container), box);
+    gtk_box_set_homogeneous(GTK_BOX(box), TRUE);
+    gtk_widget_set_name(box,"testbox");
 
-    //Title
-    createLabel(container, "Your Assignments:","title",0);
+    //--------------IMAGE---------------//
+    GtkWidget *box2 = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
+    gtk_box_append(GTK_BOX(box), box2);
+    gtk_widget_set_halign(box2, GTK_ALIGN_START);
+    
 
+    GtkWidget *image = gtk_image_new_from_file("img/img.jpg");
+    gtk_image_set_pixel_size(GTK_IMAGE(image), 55);
+    gtk_box_append(GTK_BOX(box2), image);
+    gtk_widget_set_name(image, "image");
 
-    vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL,0);
-    gtk_box_append(GTK_BOX(container),vbox);
+    createLabel(box2, "Student's HandBook","title",0);
+    
+    GtkWidget *halign = gtk_box_new(GTK_ORIENTATION_HORIZONTAL,5);
+    gtk_box_append(GTK_BOX(container), halign);
+    gtk_widget_set_name(halign,"testbox");
 
-    createLabel(vbox, "FILTER:","", 1);//layout funct(BoxToAppend, Title, NameForCss,boolean value for x-align(T))
+    GtkWidget *infoBar =gtk_box_new(GTK_ORIENTATION_VERTICAL,3);
+    gtk_box_append(GTK_BOX(halign),infoBar);
+    gtk_widget_set_name(infoBar,"box1");
+    
+    GtkWidget *subcontainer = gtk_box_new(GTK_ORIENTATION_VERTICAL, 3);
+    gtk_box_append(GTK_BOX(halign), subcontainer);
+    gtk_widget_set_name(subcontainer,"box2");   
+
+    GtkWidget *buttonAndFilterContainer = gtk_box_new(GTK_ORIENTATION_HORIZONTAL,5);
+    gtk_box_append(GTK_BOX(subcontainer), buttonAndFilterContainer);
+    createButton(buttonAndFilterContainer,"Add Work","btn",G_CALLBACK(go_back_pg_2),NULL);
+
+    createLabel(buttonAndFilterContainer, "FILTER:","", 1);//layout funct(BoxToAppend, Title, NameForCss,boolean value for x-align(T))
     filterbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL,0);
-    gtk_box_append(GTK_BOX(vbox),filterbox);
+    gtk_box_append(GTK_BOX(buttonAndFilterContainer),filterbox);
 
     //Label for DropDown/Combobox
     
@@ -606,6 +627,15 @@ void homePage(){
     gtk_box_append (GTK_BOX(filterbox), filter2);
     g_signal_connect(filter, "changed", G_CALLBACK(filterSubjectSelection),filter2);
 
+
+    //Title
+    // createLabel(container, "Your Assignments:","title",0);
+
+
+    
+
+    
+
     //title-box(table)
     // box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL,5);
     // gtk_box_append(GTK_BOX(vbox), box);
@@ -615,8 +645,28 @@ void homePage(){
     // createLabel(box,"Subject","table-title",0);
     // createLabel(box,"Assignment","table-title",0);
     // createLabel(box,"Due Date","table-title",0);
+    // GtkWidget *grid = gtk_grid_new();
+    // gtk_widget_set_name(grid,"table");
+    // gtk_box_append(GTK_BOX(vbox), grid);
 
-    displayAssignment(vbox);
+    // // Add widgets to the table
+    // GtkWidget *label1 = gtk_label_new("Row 0, Column 0");
+    // gtk_grid_attach(GTK_GRID(grid), label1, 4, 0, 1, 1);
+    // gtk_widget_set_name(label1,"table");
+
+    // GtkWidget *label2 = gtk_label_new("Row 0, Column 1");
+    // gtk_grid_attach(GTK_GRID(grid), label2, 1, 0, 1, 1);
+    // gtk_widget_set_name(label2,"table");
+
+    // GtkWidget *label3 = gtk_label_new("Row 1, Column 0");
+    // gtk_grid_attach(GTK_GRID(grid), label3, 0, 1, 1, 1);
+    // gtk_widget_set_name(label3,"table");
+
+    // GtkWidget *label4 = gtk_label_new("Row 1, Column 1");
+    // gtk_grid_attach(GTK_GRID(grid), label4, 1, 1, 1, 1);
+    // gtk_widget_set_name(label4,"table");
+
+    // displayAssignment(vbox);
     
     printf("%d", filtersno);
     gtk_window_present(GTK_WINDOW(window));
@@ -734,6 +784,7 @@ static void createWindow(GtkApplication *app, gpointer user_data){
     homePage();
 
 }
+
 int main(int argc, char **argv){
     GtkApplication *app;
     int status;
