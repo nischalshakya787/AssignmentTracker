@@ -1,49 +1,49 @@
-#window{
-    background-color: #e7e7e7;
+#window {
+  background-color: #e7e7e7;
 }
-.title{
-    font-size: 13px;
+.title {
+  font-size: 13px;
 }
-#title{
-    font-size: 20px;
-    font-weight: bold;
+#title {
+  font-size: 20px;
+  font-weight: bold;
 }
-#subject-box{
-    margin: 5px 10px;
-}
-
-#sub-title{
-    margin: 10px 8px 0 8px;
-    /* border:1px solid black; */
-    font-size:14px;
-    font-weight:600;
-}
-#container{
-    padding: 5px 15px;
-    border-radius: 5px;
-    margin:20px 30px;
-    background-color: white;
-    box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+#subject-box {
+  margin: 5px 10px;
 }
 
-#combo{
-    margin: 5px 0;
-    padding: 0 10px;
+#sub-title {
+  margin: 10px 8px 0 8px;
+  /* border:1px solid black; */
+  font-size: 14px;
+  font-weight: 600;
+}
+#container {
+  padding: 5px 15px;
+  border-radius: 5px;
+  margin: 20px 30px;
+  background-color: white;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
 }
 
-#box{
-    padding: 0px 15px 15px 15px;
-    margin:5px;
-    border:1px solid #e7e7e7;
-    border-radius: 5px;
+#combo {
+  margin: 5px 0;
+  padding: 0 10px;
 }
-#input-box{
-    margin: 5px 10px;
-    /* border: 1px solid; */
+
+#box {
+  padding: 0px 15px 15px 15px;
+  margin: 5px;
+  border: 1px solid #e7e7e7;
+  border-radius: 5px;
 }
-#calendar{
-    margin:5px 10px;
-    border-radius: 4px;
+#input-box {
+  margin: 5px 10px;
+  /* border: 1px solid; */
+}
+#calendar {
+  margin: 5px 10px;
+  border-radius: 4px;
 }
 /* #calendar .day-name{
     background:red;
@@ -60,50 +60,72 @@
 #calendar .today{
     background: yellow;
 } */
-#button1{
-    background:#4285F4;
-    margin-top: 15px;
-    min-width: 5px;
-    margin: 15px 200px;
-    border: 1px solid;
-    font-weight: 600;
-    font-size: 14px;
-    color:white;
+#button1 {
+  background: #4285f4;
+  margin-top: 15px;
+  min-width: 5px;
+  margin: 15px 200px;
+  border: 1px solid;
+  font-weight: 600;
+  font-size: 14px;
+  color: white;
 }
 
-#button1:hover{
-    background: #2261c5;
+#button1:hover {
+  background: #2261c5;
 }
-#label-submit{
-    background: #19c37d;
+#label-submit {
+  background: #19c37d;
 }
-#nothing-box{
-    font-size: 17px;
-    font-weight: 600;
+#nothing-box {
+  font-size: 17px;
+  font-weight: 600;
 }
-#delete-btn{
-    background: #dc3545;
-    color: white;
-    font-weight: 600;
-    margin:5px;
-    border: 1px solid #dc3545;
+#delete-btn {
+  background: #dc3545;
+  color: white;
+  font-weight: 600;
+  margin: 5px;
+  border: 1px solid #dc3545;
 }
-#delete-btn:hover{
-    background: #c42f3e;
+#delete-btn:hover {
+  background: #c42f3e;
 }
-#minibox{
-    padding: 14px 12px;
+#minibox {
+  padding: 14px 12px;
 }
 
-#button2{
-    background:#4285F4;
-    margin-top: 15px;
-    min-width: 5px;
-    border: 1px solid #4285F4;
-    font-weight: 600;
-    font-size: 14px;
-    color:white;
+#button2 {
+  background: #4285f4;
+  margin-top: 15px;
+  min-width: 5px;
+  border: 1px solid #4285f4;
+  font-weight: 600;
+  font-size: 14px;
+  color: white;
 }
-#button2:hover{
-    background: #2261c5;
+#button2:hover {
+  background: #2261c5;
+}
+#table {
+  border: 1px solid red;
+}
+#box1 {
+  background: red;
+  border: 1px solid black;
+  min-width: 10rem;
+}
+#box2 {
+  background: greenyellow;
+  border: 1px solid black;
+  min-width: 37rem;
+}
+#testbox {
+  border: 1px solid black;
+}
+#subcontainer-title {
+  font-size: 16px;
+  font-weight: 600;
+  border: 1px solid;
+  padding: 5px 15px;
 }
