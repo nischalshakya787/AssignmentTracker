@@ -4,6 +4,9 @@
 .title {
   font-size: 13px;
 }
+.second-page {
+  background-color: red;
+}
 #title {
   font-size: 20px;
   font-weight: bold;
@@ -22,7 +25,7 @@
   padding: 5px 15px;
   border-radius: 5px;
   margin: 20px 30px;
-  background-color: white;
+  background-color: #f8f9fd;
   box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
 }
 
@@ -44,6 +47,19 @@
 #calendar {
   margin: 5px 10px;
   border-radius: 4px;
+  /* border: 1px solid; */
+}
+#calendar header {
+  background: #343541;
+  color: white;
+  font-weight: 600;
+}
+#calendar header button {
+  background: #343541;
+  color: rgb(214, 209, 209);
+}
+#calendar grid {
+  background: white;
 }
 /* #calendar .day-name{
     background:red;
@@ -74,27 +90,60 @@
 #button1:hover {
   background: #2261c5;
 }
+#label {
+  border-bottom: 1px solid #e7e7e7;
+}
 #label-submit {
-  background: #19c37d;
+  background: #a5ee98;
+  border-bottom: 1px solid #e7e7e7;
 }
 #nothing-box {
   font-size: 17px;
   font-weight: 600;
 }
-#delete-btn {
-  background: #dc3545;
-  color: white;
+#delete-btn-d {
+  background: rgb(153, 236, 138);
+  color: black;
   font-weight: 600;
   margin: 5px;
-  border: 1px solid #dc3545;
+  border: 1px solid #a5ee98;
+  padding: 0px 5px;
+  border-radius: 50%;
 }
-#delete-btn:hover {
-  background: #c42f3e;
+#delete-btn-nd {
+  background: #fafafa;
+  color: black;
+  font-weight: 600;
+  margin: 5px;
+  border: 1px solid #fafafa;
+  padding: 0px 5px;
+  border-radius: 50%;
 }
+#delete-btn-od {
+  background: #fa9393;
+  color: black;
+  font-weight: 600;
+  margin: 5px;
+  border: 1px solid rgb(235, 189, 189);
+  padding: 0px 5px;
+  border-radius: 50%;
+}
+#delete-btn-d:hover {
+  background: #91ee81;
+}
+#delete-btn-nd:hover {
+  background: #f5f4f4;
+}
+#delete-btn-od:hover {
+  background: rgb(252, 137, 137);
+}
+
 #minibox {
   padding: 14px 12px;
 }
-
+#image {
+  background-blend-mode: normal;
+}
 #button2 {
   background: #4285f4;
   margin-top: 15px;
@@ -108,24 +157,156 @@
   background: #2261c5;
 }
 #table {
-  border: 1px solid red;
+  border-radius: 5px;
 }
 #box1 {
-  background: red;
-  border: 1px solid black;
-  min-width: 10rem;
+  padding: 0px 10px;
+  background: #f8f9fd;
+  /* border: 1px solid black; */
+  min-width: 9rem;
+}
+#nothing-box {
+  margin-top: 25px;
 }
 #box2 {
-  background: greenyellow;
-  border: 1px solid black;
+  /* border: 1px solid black; */
+  background: white;
+  padding: 8px;
   min-width: 37rem;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
 }
 #testbox {
-  border: 1px solid black;
+  padding: 15px;
+  border: 1px solid #e7e7e7;
+  border-radius: 5px;
 }
 #subcontainer-title {
+  font-size: 14px;
+  font-weight: 600;
+  /* border: 1px solid; */
+  padding: 5px 15px;
+  background: #343541;
+  color: white;
+}
+#sub-infobar {
+  margin-top: 8px;
+  background: white;
+  min-height: 25px;
+  border-radius: 5px;
+  padding: 8px 4px;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+}
+#sub-infobar2 {
+  background: white;
+  min-height: 25px;
+  border-radius: 5px;
+  padding: 8px 4px;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+}
+#InfoHead {
   font-size: 16px;
   font-weight: 600;
-  border: 1px solid;
-  padding: 5px 15px;
+}
+#InfoDateHead {
+  font-size: 16px;
+  font-weight: 600;
+}
+#subHead {
+  font-size: 14px;
+  font-weight: 500;
+}
+#subInfo0 {
+  font-size: 15px;
+  font-weight: 600;
+}
+#subInfo1 {
+  font-size: 15px;
+  color: #ec3c3c;
+  font-weight: 600;
+}
+#subInfo2 {
+  font-size: 15px;
+  color: #55ec3c;
+  font-weight: 600;
+}
+#check-btn-d {
+  background: #a5ee98;
+  border-bottom: 1px solid #e7e7e7;
+}
+#check-btn-nd {
+  border-bottom: 1px solid #e7e7e7;
+}
+#check-btn-od {
+  border-bottom: 1px solid #e7e7e7;
+  background-color: #fa9393;
+}
+#check-btn {
+  margin-left: 8px;
+}
+#btn-filter {
+  padding: 10px 0px 10px 15px;
+}
+#btn {
+  background: #4285f4;
+  border: 1px solid #4285f4;
+  font-weight: 600;
+  font-size: 14px;
+  color: white;
+  border-radius: 5px;
+}
+#btn:hover {
+  background: #2261c5;
+}
+#btn1 {
+  background: #343541;
+  border: 1px solid #343541;
+  font-weight: 600;
+  font-size: 14px;
+  color: white;
+  border-radius: 5px;
+}
+#btn1:hover {
+  background: #2e3138;
+}
+
+#lbl {
+  margin-left: 40px;
+  font-weight: 700;
+  font-size: 16px;
+}
+#flt {
+  min-width: 50px;
+  margin-left: 8px;
+}
+#label-overdue {
+  background-color: #fa9393;
+  border-bottom: 1px solid #e7e7e7;
+}
+#circle-1 {
+  background-color: #a5ee98;
+  border-radius: 50%;
+  min-width: 20px;
+  padding: 0;
+}
+#circle-2 {
+  background-color: #fa9393;
+  border-radius: 50%;
+  min-width: 20px;
+  padding: 0;
+}
+#color-info-box {
+  padding: 5px;
+}
+#color-info {
+  font-weight: 600;
+  font-size: 15px;
+}
+#button3 {
+  background: #343541;
+  margin-top: 15px;
+  min-width: 5px;
+  border: 1px solid #343541;
+  font-weight: 600;
+  font-size: 14px;
+  color: white;
 }
