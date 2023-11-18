@@ -13,3 +13,6 @@ My First Semester Project.
 Summary:
 Assignment Tracker project is a program, which will be developed in C will assist users in managing their assignments efficiently. This Assignment Tracker project aims to provide students with a reliable tool for managing their assignments effectively, improving productivity and ensuring timely completion of tasks. This project offers a user-friendly interface where users can add new assignments, mark assignments as complete and view the list of assignments. 
 
+```
+You need to have GTK and GCC installed in your device.
+```
